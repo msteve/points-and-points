@@ -44,7 +44,66 @@ class Points_Settings_Tab {
      *
      * @return array Array of settings for @see woocommerce_admin_fields() function.
      */
+
+    /*public static function get_settings() {
+        $settings = array(
+                            array(
+                            'name' => __( 'Pricing Options', 'woocommerce' ),
+                            'type' => 'title',
+                            'desc' => __('The following options affect how prices are displayed on the frontend.', 'woocommerce'),
+                            'id'   => 'pricing_options'
+                            ),
+              
+                            array(
+                            'name'    => __( 'Currency Position', 'woocommerce' ),
+                            'desc'    => __( 'This controls the position of the currency symbol.', 'woocommerce' ),
+                            'id'      => 'woocommerce_currency_pos',
+                            'css'     => 'min-width:150px;',
+                            'std'     => 'left', // WooCommerce < 2.0
+                            'default' => 'left', // WooCommerce >= 2.0
+                            'type'    => 'select',
+                            'options' => array(
+                                'left'        => __( 'Left', 'woocommerce' ),
+                                'right'       => __( 'Right', 'woocommerce' ),
+                                'left_space'  => __( 'Left (with space)', 'woocommerce' ),
+                                'right_space' => __( 'Right (with space)', 'woocommerce' )
+                            ),
+                            'desc_tip' =>  true,
+                            ),
+              
+                            array(
+                            'name'     => __( 'Thousand separator', 'woocommerce' ),
+                            'desc'     => __( 'This sets the thousand separator of displayed prices.', 'woocommerce' ),
+                            'id'       => 'woocommerce_price_thousand_sep',
+                            'css'      => 'width:30px;',
+                            'std'      => ',', // WooCommerce < 2.0
+                            'default'  => ',', // WooCommerce >= 2.0
+                            'type'     => 'text',
+                            'desc_tip' =>  true,
+                            ),
+                
+                                array(
+                                'name'    => __( 'Trailing zeros', 'woocommerce' ),
+                                'desc'    => __( 'Remove zeros after the decimal point. e.g. $10.00 becomes $10', 'woocommerce' ),
+                                'id'      => 'woocommerce_price_trim_zeros',
+                                'std'     => 'yes', // WooCommerce < 2.0
+                                'default' => 'yes', // WooCommerce >= 2.0
+                                'type'    => 'checkbox'
+                                ),
+              
+                             array( 'type' => 'sectionend', 'id' => 'pricing_options' ),
+                );
+                
+               
+    
+            return apply_filters( 'points_settings_tab_settings', $settings );
+                
+    }*/
+
     public static function get_settings() {
+
+        //array for the levels 
+
         $settings = array(
             'section_title' => array(
                 'name'     => __( 'Points and Credits To be Earned', 'points' ),
@@ -52,28 +111,45 @@ class Points_Settings_Tab {
                 'desc'     => 'Assign Points and credits Earned for every user at each level',
                 'id'       => 'points_settings_tab_title'
             ),
-            'title' => array(
-                'name' => __( 'Title', 'points' ),
-                'type' => 'text',
-                'desc' => __( 'This is some helper text', 'points' ),
-                'id'   => 'points_settings_tab_section_title'
+            'Franchisee' => array(
+                'name' => __( 'Franchisee Points Earned', 'points' ),
+                'type' => 'number',
+                'placeholder'=>'e.g 5',
+                'desc' => __( 'The number of points the Franchisee earns after when his/her down line Joins', 'points' ),
+                'id'   => 'points_settings_tab_franchisee_points'
             ),
-            'description' => array(
-                'name' => __( 'Description', 'points' ),
-                'type' => 'textarea',
-                'desc' => __( 'This is a paragraph describing ta yadda. Lorem ipsum yadda yadda yadda. Lorem ipsum yadda yadda yadda. Lorem ipsum yadda yadda yadda.', 'points' ),
-                'id'   => 'points_settings_tab_description'
-            ),
-            'credits' => array(
-                'name' => __( 'Credits', 'points' ),
-                'type' => 'text',
-                'desc' => __( 'This is a paragraph yadda yadda. Lorem ipsum yadda yadda yadda.', 'points' ),
-                'id'   => 'points_settings_tab_credits'
+            'FranchiseesCredit' => array(
+                'name' => '',//,__( 'Franchisees Credit Earned', 'points' ),
+                'type' => 'number',
+                 'placeholder'=>'e.g 10%',
+                'desc' => __( '(%)The Credits Percentage Earned by a Franchisee after when his/her down line Joins', 'points' ),
+                'id'   => 'points_settings_tab_franchisees_credits'
             ),
 
+            'downline' => array(
+                'name' => __( 'Downline Points Earned', 'points' ),
+                'type' => 'number',
+                'placeholder'=>'e.g 5',
+                'desc' => __( 'The number of points the Downline earns after  Joining', 'points' ),
+                'id'   => 'points_settings_tab_downline_points'
+            ),
+            'downlineCredit' => array(
+                'name' => '',//,__( 'Franchisees Credit Earned', 'points' ),
+                'type' => 'number',
+                 'placeholder'=>'e.g 10%',
+                'desc' => __( '(%)The Credits Percentage Earned by a Down line after Joining', 'points' ),
+                'id'   => 'points_settings_tab_downline_credits'
+            ),
 
-            
+            'downlineCredit' => array(
+                'name' => '',//,__( 'Franchisees Credit Earned', 'points' ),
+                'type' => 'number',
+                 'placeholder'=>'e.g 10%',
+                'desc' => __( '(%)The Credits Percentage Earned by a Down line after Joining', 'points' ),
+                'id'   => 'points_settings_tab_downline_credits'
+            ),
 
+       
             'section_end' => array(
                  'type' => 'sectionend',
                  'id' => 'points_settings_tab_section_end'
