@@ -4,24 +4,104 @@
   Plugin Name: Points And Ponits
   Description: Give points to Woo commerce Users and Level
   Version: 1.0
-  Author: Stephen Mbaalu
-  Author URI: http://authorsite.com/
-  Plugin URI: http://authorsite.com/points-and-points
+  Author: Steve M Prince
+  Author URI: https://www.facebook.com/steven.mbaalu
+  Plugin URI: https://www.facebook.com/steven.mbaalu
  */
 
 include_once( 'includes/settings.php' );
+include_once( 'includes/ApConstants.php' );
+//3288
+
 
 add_action( 'woocommerce_payment_complete', 'points_payment_complete' );
 function points_payment_complete( $order_id ){
+   // echo "Giving Poinst >>> ";
     $order = wc_get_order( $order_id );
-    error_log( "Order complete for order $order_id", 0 );
-    error_log( $order, 0 );
+    // $order = wc_get_order( $order_id );
+   // error_log( "Order complete for order $order_id", 0 );
+   /// error_log( $order, 0 );
     //give him points and referrer and credits As well
     $user = $order->get_user();
-    error_log( $user, 0 );
+    $point_got=get_option( 'points_settings_tab_downline_points', true );
+    $price=$order->get_total();
+    $credit_got=(get_option( 'points_settings_tab_downline_credits', true )/100)*$price;
+  
+    
     if( $user ){
+        $user_id=$user->ID;
         // do something with the user
+
+       // $order_id=3288;
+       // $order = wc_get_order( $order_id );
+        //print_r($order);
+      //  $billing_address = $order->get_billing_address();
+       /// print_r($billing_address);
+       // $user = $order->get_user();
+       // print_r($user->ID);
+       //$order_data = $order->get_data();
+      // print_r(get_user_meta( $user->ID, 'shipping_first_name', true ));
+      // print_r(get_user_meta( $user->ID, 'billing_referrer', true ));
+
+      // Set Points and Credits   
+      //Set update_user_meta( $user_id, $meta_key, $meta_value, $prev_value );
+      //Cost print_r($order->get_total());
+
+      //Get Old User Points 
+      $user_points = get_user_meta( $user_id, ApConstants::$USER_POINTS, true); 
+     // echo "DOWNL USer had ".$user_points." Points ###";
+      if($user_points){
+            $tol=$user_points+$point_got;
+            update_user_meta( $user_id, ApConstants::$USER_POINTS,$tol);
+           // echo "DOWN Update Adding Poooins ".$user_points." Points ###";
+        }else{
+            update_user_meta( $user_id,ApConstants::$USER_POINTS, $point_got);
+          //  echo "DOWN Adding Adding Poooins ".$user_points." Points ###";
+        }
+
+      $user_credits = get_user_meta( $user_id,  ApConstants::$USER_CREDIT, true); 
+      if($user_credits){
+            $tol=$user_credits+$credit_got;
+            update_user_meta( $user_id, ApConstants::$USER_CREDIT,$tol);
+        }else{
+             update_user_meta( $user_id,ApConstants::$USER_CREDIT, $credit_got);
+        }
+        //Now for the franchise
+        $refferer=get_user_meta( $user->ID, 'billing_referrer', true );
+
+        //echo "FRN  ID ".$refferer." ,, ###";
+        if($refferer){
+            $user_franch = get_user_by('login',$refferer);
+
+            if($user_franch)
+            {
+               $user_id_franch=$user_franch->ID;
+             //  echo "FRN  ID ".$user_id_franch." ,, ###";
+               $point_got=get_option( 'points_settings_tab_downline_points', true );
+               $credit_got=(get_option( 'points_settings_tab_franchisees_credits', true )/100)*$price;
+
+               $user_points = get_user_meta( $user_id_franch, ApConstants::$USER_POINTS, true); 
+                if($user_points){
+                        $tol=$user_points+$point_got;
+                        update_user_meta( $user_id_franch, ApConstants::$USER_POINTS,$tol);
+                    }else{
+                        update_user_meta( $user_id_franch,ApConstants::$USER_POINTS, $point_got);
+                    }
+
+                    $user_credits = get_user_meta( $user_id_franch,  ApConstants::$USER_CREDIT, true); 
+                    if($user_credits){
+                            $tol=$user_credits+$credit_got;
+                            update_user_meta( $user_id_franch, ApConstants::$USER_CREDIT,$tol);
+                        }else{
+                            update_user_meta( $user_id_franch,ApConstants::$USER_CREDIT, $credit_got);
+                        }
+
+
+            }
+        }
+
     }
+}
 
 
     /*
@@ -47,32 +127,6 @@ wp_remote_post( $url, array(
 );
      */
 
-}
-
-
-
-
-
-//Add custom fields to billing fields 
-
-/*add_filter( 'woocommerce_billing_fields' , 'points_custom_checkout_fields',5 );
-
-// Our hooked in function - $fields is passed via the filter!
-function points_custom_checkout_fields( $fields ) {
-
-    if (!is_user_logged_in()){
-    $fields['billing_options']= array(
-        'label' => __('Referrer', 'points'), // Add custom field label
-        'placeholder' => _x('Referer code', 'placeholder', 'points'), // Add custom field placeholder
-        'required' => true, // if field is required or not
-        'clear' => false, // add clear or not
-        'type' => 'text' // add field type
-        //'class' => array('my-css')    // add class name
-    );
-}
-    return $fields;
-}*/
-
 
 // Hook in
 add_filter( 'woocommerce_checkout_fields' , 'points_custom_override_checkout_fields' );
@@ -97,89 +151,8 @@ if (!is_user_logged_in()){
  * Display field value on the order edit page
  */
 
- 
 add_action( 'woocommerce_admin_order_data_after_shipping_address', 'points_my_custom_checkout_field_display_admin_order_meta', 10, 1 );
 
 function points_my_custom_checkout_field_display_admin_order_meta($order){
     echo '<p><strong>'.__('Referrer','points').':</strong> ' . get_post_meta( $order->get_id(), '_billing_referrer', true ) . '</p>';
 }
-
-/**
- * Register core post types.
- */
-
-/*function register_msarcade_shops() {
-    if (post_type_exists('msshop')) {
-        return;
-    }
-
-    $labels = array(
-        'name' => __('Shops', 'msarcades'),
-        'singular_name' => __('Shop', 'msarcades'),
-        'menu_name' => _x('Shops', 'Admin menu name', 'msarcades'),
-        'add_new' => __('Add Shop', 'msarcades'),
-        'add_new_item' => __('Add New Shop', 'msarcades'),
-        'edit' => __('Edit', 'msarcades'),
-        'edit_item' => __('Edit Product', 'msarcades'),
-        'new_item' => __('New Shop', 'msarcades'),
-        'view' => __('View Shop', 'msarcades'),
-        'view_item' => __('View Shop', 'msarcades'),
-        'search_items' => __('Search Shops', 'msarcades'),
-        'not_found' => __('No Shops found', 'msarcades'),
-        'not_found_in_trash' => __('No Shops found in trash', 'msarcades'),
-        'parent' => __('Parent Shop', 'msarcades'),
-        'featured_image' => __('Shop Image', 'msarcades'),
-        'set_featured_image' => __('Set Shop image', 'msarcades'),
-        'remove_featured_image' => __('Remove Shop image', 'msarcades'),
-        'use_featured_image' => __('Use as Shop image', 'msarcades'),
-        'insert_into_item' => __('Insert into Shop', 'msarcades'),
-        'uploaded_to_this_item' => __('Uploaded to this Shop', 'msarcades'),
-        'filter_items_list' => __('Filter Shops', 'msarcades'),
-        'items_list_navigation' => __('Shops navigation', 'msarcades'),
-        'items_list' => __('Shops list', 'msarcades'),
-    );
-
-    $args = array(
-        'labels' => $labels,
-        'hierarchical' => true,
-        'description' => 'Shops in a business',
-        'supports' => array('title', 'editor', 'author', 'thumbnail', 'trackbacks', 'custom-fields', 'comments', 'revisions', 'page-attributes'),
-        'taxonomies' => array('genres'),
-        'public' => true,
-        'show_ui' => true,
-        'show_in_menu' => true,
-        'menu_position' => 5,
-        //'menu_icon' => 'dashicons-format-audio',
-        'show_in_nav_menus' => true,
-        'publicly_queryable' => true,
-        'exclude_from_search' => false,
-        'has_archive' => true,
-        'query_var' => true,
-        'can_export' => true,
-        'rewrite' => true,
-        'capability_type' => 'post'
-    );
-
-    register_post_type('business_shop', $args);
-}
-
-add_action('init', 'register_msarcade_shops');
-
-function arcades_taxonomy() {
-
-    register_taxonomy(
-            'arcades', 'business_shop', array(
-        'hierarchical' => true,
-        'label' => 'Arcades',
-        'query_var' => true,
-        'rewrite' => array(
-            'slug' => 'arcade',
-            'with_front' => false
-        )
-            )
-    );
-}
-
-add_action('init', 'arcades_taxonomy');
-
-include_once( 'includes/ShopWidget.php' );*/
