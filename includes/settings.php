@@ -46,8 +46,6 @@ class Points_Settings_Tab {
 
         //get the level setting
        // echo 'Points Level 1>> '.get_option( 'points_settings_tab_level1_points', true );
-
-
        $levelPoints=[];
        $level="0";
 
@@ -95,9 +93,9 @@ function points_information_endpoint_content() {
     $user_credits = get_user_meta( $user_id,  ApConstants::$USER_CREDIT, true); 
     //print_r("## USER CURRENT ".$user_id." ###");
     $level=Points_Settings_Tab::points_calculateUserLevel();
+
+    $username=get_userdata( $user_id )->user_login;
    
-
-
     ?>
 <style>
             .top_tiles {
@@ -212,6 +210,10 @@ function points_information_endpoint_content() {
                 </div>
               </div>
               
+            </div>
+            <div class="row">
+            <br/> <br/> <br/>
+            <h6>Referrer name <strong><?=$username?></<strong> </h6>
             </div>
    
    
