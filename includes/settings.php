@@ -39,27 +39,33 @@ class Points_Settings_Tab {
 
 
        if($user_id=="0"){
-        $user_id=get_current_user_id();
-    }
+            $user_id=get_current_user_id();
+        }
         //get User Points
         $user_points = get_user_meta( $user_id, ApConstants::$USER_POINTS, true); 
 
         //get the level setting
-       // echo 'Points Level 1>> '.get_option( 'points_settings_tab_level1_points', true );
-       $levelPoints=[];
-       $level="0";
+        //echo 'Points >> '.$user_points;
+        $levelPoints=[];
+        $level="0";
 
-       if( $user_points >0){
+        if( $user_points >0){
+          // echo 'Points >> '.$user_points;
             for($i=10;$i>0;$i--){    //the
                 $point=get_option( 'points_settings_tab_level'.$i.'_points', true );
                 $levelPoints[]=$point;
-                if($user_points<=$point){
+                if($user_points>$point && $i==10){
+                    $level=$i;
+                   // echo 'Points >> '.$user_points.' Points for '.$i.' = '.$point;
+                    break;
+                }
+                else if($user_points<=$point){
                     $level=$i;
                 }
             }
         }
 
-    return $level;
+        return $level;
 
     }
 
@@ -70,9 +76,18 @@ class Points_Settings_Tab {
  * @return arr
  */
 public static function points_account_menu_items( $items ) {
-    $items['points_and_credits'] = __( 'Points And Credits', 'points' );
- 
-    return $items;
+    $items2=[];
+    $i=0;
+    foreach($items as $key=>$value){
+        if($i==1){
+            $items2['points_and_credits'] = __( 'Points And Credits', 'points' );
+        }else{
+            $items2[$key]=$value;
+            //print_r($key);
+        }
+        $i++;     
+    }
+    return $items2;
 }
 /** 
 * Add endpoint
@@ -97,94 +112,94 @@ function points_information_endpoint_content() {
     $username=get_userdata( $user_id )->user_login;
    
     ?>
-<style>
-            .top_tiles {
-                margin-bottom: 0;
-            }
-            .row {
-                margin-right: -10px;
-                margin-left: -10px;
-            }
-            .tile-stats {
-                position: relative;
-                display: block;
-                margin-bottom: 12px;
-                border: 1px solid #E4E4E4;
-                -webkit-border-radius: 5px;
-                overflow: hidden;
-                padding-bottom: 5px;
-                -webkit-background-clip: padding-box;
-                -moz-border-radius: 5px;
-                -moz-background-clip: padding;
-                border-radius: 5px;
-                background-clip: padding-box;
-                background: #FFF;
-                transition: all 300ms ease-in-out;
-            }
-            .tile-stats .icon {
-                width: 20px;
-                height: 20px;
-                color: #BAB8B8;
-                position: absolute;
-                right: 53px;
-                top: 22px;
-                z-index: 1;
-            }
-            .tile-stats .count, .tile-stats h3, .tile-stats p {
-                position: relative;
-                margin: 0;
-                margin-left: 10px;
-                z-index: 5;
-                padding: 0;
-            }
-            .tile-stats .count {
-                font-size: 38px;
-                font-weight: bold;
-                line-height: 1.65857;
-            }
-            .tile-stats h3 {
-                color: #BAB8B8;
-            }
-            .tile-stats .count, .tile-stats h3, .tile-stats p {
-                position: relative;
-                margin: 0;
-                margin-left: 10px;
-                z-index: 5;
-                padding: 0;
-            }
-            .tile-stats p {
-                margin-top: 5px;
-                font-size: 12px;
-            }
-            .tile-stats .count, .tile-stats h3, .tile-stats p {
-                position: relative;
-                margin: 0;
-                margin-left: 10px;
-                z-index: 5;
-                padding: 0;
-            }
-            .tile-stats .icon i {
-                margin: 0;
-                font-size: 60px;
-                line-height: 0;
-                vertical-align: bottom;
-                padding: 0;
-            }
+    <style>
+                .top_tiles {
+                    margin-bottom: 0;
+                }
+                .row {
+                    margin-right: -10px;
+                    margin-left: -10px;
+                }
+                .tile-stats {
+                    position: relative;
+                    display: block;
+                    margin-bottom: 12px;
+                    border: 1px solid #E4E4E4;
+                    -webkit-border-radius: 5px;
+                    overflow: hidden;
+                    padding-bottom: 5px;
+                    -webkit-background-clip: padding-box;
+                    -moz-border-radius: 5px;
+                    -moz-background-clip: padding;
+                    border-radius: 5px;
+                    background-clip: padding-box;
+                    background: #FFF;
+                    transition: all 300ms ease-in-out;
+                }
+                .tile-stats .icon {
+                    width: 20px;
+                    height: 20px;
+                    color: #BAB8B8;
+                    position: absolute;
+                    right: 53px;
+                    top: 22px;
+                    z-index: 1;
+                }
+                .tile-stats .count, .tile-stats h3, .tile-stats p {
+                    position: relative;
+                    margin: 0;
+                    margin-left: 10px;
+                    z-index: 5;
+                    padding: 0;
+                }
+                .tile-stats .count {
+                    font-size: 38px;
+                    font-weight: bold;
+                    line-height: 1.65857;
+                }
+                .tile-stats h3 {
+                    color: #BAB8B8;
+                }
+                .tile-stats .count, .tile-stats h3, .tile-stats p {
+                    position: relative;
+                    margin: 0;
+                    margin-left: 10px;
+                    z-index: 5;
+                    padding: 0;
+                }
+                .tile-stats p {
+                    margin-top: 5px;
+                    font-size: 12px;
+                }
+                .tile-stats .count, .tile-stats h3, .tile-stats p {
+                    position: relative;
+                    margin: 0;
+                    margin-left: 10px;
+                    z-index: 5;
+                    padding: 0;
+                }
+                .tile-stats .icon i {
+                    margin: 0;
+                    font-size: 60px;
+                    line-height: 0;
+                    vertical-align: bottom;
+                    padding: 0;
+                }
 
-            .fa {
-                display: inline-block;
-                font: normal normal normal 14px/1 FontAwesome;
-                font-size: inherit;
-                text-rendering: auto;
-                -webkit-font-smoothing: antialiased;
-                -moz-osx-font-smoothing: grayscale;
-            }
-                
-</style>
+                .fa {
+                    display: inline-block;
+                    font: normal normal normal 14px/1 FontAwesome;
+                    font-size: inherit;
+                    text-rendering: auto;
+                    -webkit-font-smoothing: antialiased;
+                    -moz-osx-font-smoothing: grayscale;
+                }
+                    
+    </style>
   
-  <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.4.2/css/all.css" integrity="sha384-/rXc/GQVaYpyDdyxK+ecHPVYJSN9bmVFBvjA/9eOB+pb3F2w2N6fc5qB9Ew5yIns" crossorigin="anonymous">
 
-        <div class="row top_tiles">
+    <div class="row top_tiles">
               <div class="animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="tile-stats">
                   <div class="icon"><i class="fa fa-dollar-sign"></i></div>
@@ -203,7 +218,7 @@ function points_information_endpoint_content() {
               </div>
               <div class="animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="tile-stats">
-                  <div class="icon"><i class="fa fa-sort-amount-desc"></i></div>
+                  <div class="icon"><i class="fa fa-sort-amount-asc"></i></div>
                   <div class="count"><?=$level?></div>
                   <h3>Level</h3>
                  
@@ -214,10 +229,7 @@ function points_information_endpoint_content() {
             <div class="row">
             <br/> <br/> <br/>
             <h6>Referrer name <strong><?=$username?></<strong> </h6>
-            </div>
-   
-   
-
+    </div>
     <?php
 
 }
@@ -229,6 +241,7 @@ function points_information_endpoint_content() {
      */
     public static function add_settings_tab( $settings_tabs ) {
         $settings_tabs['settings_tab_points'] = __( 'Points And Credits', 'points' );
+       // $settings_tabs['customer_level'] = __( 'Customer Level', 'points' );
         return $settings_tabs;
     }
 

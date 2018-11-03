@@ -11,6 +11,7 @@
 
 include_once( 'includes/settings.php' );
 include_once( 'includes/ApConstants.php' );
+include_once( 'includes/Points_List_Users_Table.php' );
 //3288
 
 
@@ -154,5 +155,93 @@ if (!is_user_logged_in()){
 add_action( 'woocommerce_admin_order_data_after_shipping_address', 'points_my_custom_checkout_field_display_admin_order_meta', 10, 1 );
 
 function points_my_custom_checkout_field_display_admin_order_meta($order){
-    echo '<p><strong>'.__('Referrer','points').':</strong> ' . get_post_meta( $order->get_id(), '_billing_referrer', true ) . '</p>';
+    $user = $order->get_user();
+    echo '<p><strong>'.__('Referrer','points').':</strong> ' . get_user_meta( $user->ID, 'billing_referrer', true ) . '</p>';
 }
+
+
+add_action('admin_menu', 'points_submenu_customerLevels');
+
+function points_submenu_customerLevels() {
+    add_submenu_page( 'woocommerce', 'Customer Levels', 'Customer Levels', 'manage_options', 'points-customer_levels', 'points_customer_levels_callback' );
+}
+
+function points_customer_levels_callback() {
+
+   // echo '<div class="wrap"><div id="icon-tools" class="icon32"></div>';
+    //    echo '<h2> Sub menu test page</h2>';
+   // echo '</div>';
+   ?>
+  <!-- <div class="wrap">
+       <div class="icon32" id="icon-users"><br></div>
+       <h2>Customers and Levels</h2> -->
+    <?php
+
+    $args = array(
+        'role'    => 'Customer',
+        'orderby' => 'user_nicename',
+        'order'   => 'ASC'
+    );
+    $users = get_users( $args );
+    //print_r($users);
+
+    $dat=[];
+
+    foreach($users as $user){
+      //  print_r($user); points_calculateUserLevel( $user_id="0")
+      // $user_credits = get_user_meta( $user_id,  ApConstants::$USER_CREDIT, true);
+      //Points_Settings_Tab::points_calculateUserLevel($user->ID),
+        $dat[]=[ 'ID' => $user->ID,'booktitle' => $user->user_login,
+         'author' => Points_Settings_Tab::points_calculateUserLevel($user->ID),
+         'isbn' => get_user_meta($user->ID,  ApConstants::$USER_CREDIT, true)
+        ]; 
+         //get_user_meta($user->ID,  ApConstants::$USER_CREDIT, true)
+       // 'isbn' => ""] ;//get_user_meta($user->ID, ApConstants::$USER_POINTS, true)
+           
+    }
+   // print_r($users);
+    print_r($dat);
+
+   // echo '<ul>';
+   // foreach ( $users as $user ) {
+   //     echo '<li>' . esc_html( $user->display_name ) . '[' . esc_html( $user->user_email ) . ']</li>';
+   // }
+   // echo '</ul>';
+   add_options($dat);
+   my_render_list_page();
+
+}
+
+
+function my_add_menu_items(){
+    $hook = add_menu_page( 'My Plugin List Table', 'My List Table Example', 'activate_plugins', 'my_list_test', 'my_render_list_page' );
+    add_action( "load-$hook", 'add_options' );
+  }
+
+  function add_options($dat) {
+    global $myListTable;
+    $option = 'per_page';
+    $args = array(
+           'label' => 'Books',
+           'default' => 10,
+           'option' => 'books_per_page'
+           );
+    add_screen_option( $option, $args );
+    //pass Data
+    $myListTable = new Points_List_Users_Table($dat);
+  }
+
+ // add_action( 'admin_menu', 'my_add_menu_items' );
+
+  function my_render_list_page(){
+    global $myListTable;
+    echo '</pre><div class="wrap"><h2>Customers and Levels</h2>'; 
+    $myListTable->prepare_items(); 
+  ?>
+    <form method="post">
+      <input type="hidden" name="page" value="ttest_list_table">
+      <?php
+        $myListTable->search_box( 'search', 'search_id' );
+        $myListTable->display(); 
+    echo '</form></div>'; 
+  }
