@@ -7,24 +7,24 @@ if( ! class_exists( 'WP_List_Table' ) ) {
 class Points_List_Users_Table extends WP_List_Table {
     var $example_data = array(
         array( 'ID' => 1,'booktitle' => 'Quarter Share', 'author' => 'Nathan Lowell', 
-               'isbn' => '978-0982514542' ),
+               'isbn' => '978-0982514542' ,'points'=>"127"),
         array( 'ID' => 2, 'booktitle' => '7th Son: Descent','author' => 'J. C. Hutchins',
-               'isbn' => '0312384378' ),
+               'isbn' => '0312384378','points'=>"127" ),
         array( 'ID' => 3, 'booktitle' => 'Shadowmagic', 'author' => 'John Lenahan',
-               'isbn' => '978-1905548927' ),
+               'isbn' => '978-1905548927' ,'points'=>"127"),
         array( 'ID' => 4, 'booktitle' => 'The Crown Conspiracy', 'author' => 'Michael J. Sullivan',
-               'isbn' => '978-0979621130' ),
+               'isbn' => '978-0979621130','points'=>"127" ),
         array( 'ID' => 5, 'booktitle'     => 'Max Quick: The Pocket and the Pendant', 'author'    => 'Mark Jeffrey',
-               'isbn' => '978-0061988929' ),
+               'isbn' => '978-0061988929' ,'points'=>"127"),
         array('ID' => 6, 'booktitle' => 'Jack Wakes Up: A Novel', 'author' => 'Seth Harwood',
-              'isbn' => '978-0307454355' )
+              'isbn' => '978-0307454355' ,'points'=>"127")
     );
 
         function __construct($data){
         global $status, $page;
        // print_r($this->example_data);
        // echo '</br> >>>>';
-        print_r($data);
+      //  print_r($data);
 
         $this->example_data=$data;
             parent::__construct( array(
@@ -41,9 +41,10 @@ class Points_List_Users_Table extends WP_List_Table {
         return;
         echo '<style type="text/css">';
         echo '.wp-list-table .column-id { width: 5%; }';
-        echo '.wp-list-table .column-booktitle { width: 40%; }';
+        echo '.wp-list-table .column-booktitle { width: 30%; }';
         echo '.wp-list-table .column-author { width: 35%; }';
         echo '.wp-list-table .column-isbn { width: 20%;}';
+        echo '.wp-list-table .column-points { width: 10%;}';
         echo '</style>';
     }
     function no_items() {
@@ -54,6 +55,7 @@ class Points_List_Users_Table extends WP_List_Table {
             case 'booktitle':
             case 'author':
             case 'isbn':
+            case 'points':
                 return $item[ $column_name ];
             default:
                 return print_r( $item, true ) ; //Show the whole array for troubleshooting purposes
@@ -63,7 +65,8 @@ class Points_List_Users_Table extends WP_List_Table {
         $sortable_columns = array(
             'booktitle'  => array('booktitle',false),
             'author' => array('author',false),
-            'isbn'   => array('isbn',false)
+            'isbn'   => array('isbn',false),
+            'points'   => array('points',false)
         );
         return $sortable_columns;
     }
@@ -72,7 +75,8 @@ class Points_List_Users_Table extends WP_List_Table {
             'cb'        => '<input type="checkbox" />',
             'booktitle' => __( 'Customer Name', 'points' ),
             'author'    => __( 'Level', 'points' ),
-            'isbn'      => __( 'Credit', 'points' )
+            'isbn'      => __( 'Credit', 'points' ),
+            'points'      => __( 'Points', 'points' )
         );
          return $columns;
     }

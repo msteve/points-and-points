@@ -202,7 +202,7 @@ function points_information_endpoint_content() {
     <div class="row top_tiles">
               <div class="animated flipInY col-lg-4 col-md-4 col-sm-6 col-xs-12">
                 <div class="tile-stats">
-                  <div class="icon"><i class="fa fa-dollar-sign"></i></div>
+                  <div class="icon" style="top: 0px;"><img src=" <?=plugins_url( 'images/favicon-256.png', __FILE__ )?> " style="height: 330%;width:330%;max-width:330%"/></div>
                   <div class="count"><?=$user_credits?$user_credits:0?></div>
                   <h3>Credit</h3>
                  
@@ -352,27 +352,50 @@ function points_information_endpoint_content() {
             ),
 
             'downline' => array(
-                'name' => __( 'Downline Points Earned', 'points' ),
+                'name' => __( 'Downline Points Earned Level 1', 'points' ),
                 'type' => 'number',
                 'placeholder'=>'e.g 5',
-                'desc' => __( 'The number of points the Downline earns after  Joining', 'points' ),
+                'desc' => __( 'The number of points the Downline Level 1 earns after  Joining', 'points' ),
                 'id'   => 'points_settings_tab_downline_points'
             ),
             'downlineCredit' => array(
                 'name' => '',//,__( 'Franchisees Credit Earned', 'points' ),
                 'type' => 'number',
                  'placeholder'=>'e.g 10%',
-                'desc' => __( '(%)The Credits Percentage Earned by a Down line after Joining', 'points' ),
+                'desc' => __( '(%)The Credits Percentage Earned by a Down line Level 1 after Joining', 'points' ),
                 'id'   => 'points_settings_tab_downline_credits'
-            ),
+            )
+        );
 
-            'level1Points' => array(
-                'name' => __( 'Points for Level 1', 'points' ),//,__( 'Franchisees Credit Earned', 'points' ),
+        //`Add upto level 10 downlines
+        for($i=2; $i<11;$i++){
+            $settings['downline'.$i] =[
+                'name' => __( 'Downline Points Earned Level '.$i, 'points' ),
                 'type' => 'number',
-                 'placeholder'=>'e.g 10',
-                'desc' => __( 'Points Required for level 1', 'points' ),
-                'id'   => 'points_settings_tab_level1_points'
-            ),
+                'placeholder'=>'e.g 5',
+                'desc' => __( 'The number of points the Downline Level '.$i.' earns after  Joining', 'points' ),
+                'id'   => 'points_settings_tab_downline_points'.$i
+            ];
+            $settings['downlineCredit'.$i] =[
+                'name' => '',//,__( 'Franchisees Credit Earned', 'points' ),
+                'type' => 'number',
+                 'placeholder'=>'e.g 10%',
+                'desc' => __( '(%)The Credits Percentage Earned by a Down line Level '.$i.' after Joining', 'points' ),
+                'id'   => 'points_settings_tab_downline_credits'.$i
+            ];
+        }
+
+
+        $settings['level1Points'] =[
+            'name' => __( 'Points for Level 1', 'points' ),//,__( 'Franchisees Credit Earned', 'points' ),
+            'type' => 'number',
+             'placeholder'=>'e.g 10',
+            'desc' => __( 'Points Required for level 1', 'points' ),
+            'id'   => 'points_settings_tab_level1_points'
+        ];
+
+            
+            $settingsDown = array(
             'level2Points' => array(
                 'name' => __( 'Points for Level 2', 'points' ),//,__( 'Franchisees Credit Earned', 'points' ),
                 'type' => 'number',
@@ -441,6 +464,13 @@ function points_information_endpoint_content() {
                  'id' => 'points_settings_tab_section_end'
             )
         );
+
+        foreach($settingsDown as $key=>$value){
+            $settings[$key]=$value;
+        }
+
+       // array_push($settings,$settingsDown);
+       // print_r($settings);
         return apply_filters( 'points_settings_tab_settings', $settings );
 
         //wc_settings_tab_demo_settings

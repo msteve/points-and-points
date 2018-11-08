@@ -15,11 +15,10 @@ include_once( 'includes/Points_List_Users_Table.php' );
 //3288
 
 
-add_action( 'woocommerce_payment_complete', 'points_payment_complete' );
+//add_action( 'woocommerce_payment_complete', 'points_payment_complete' );
+add_action( 'woocommerce_order_status_completed', 'points_payment_complete' );
 function points_payment_complete( $order_id ){
-   // echo "Giving Poinst >>> ";
     $order = wc_get_order( $order_id );
-    // $order = wc_get_order( $order_id );
    // error_log( "Order complete for order $order_id", 0 );
    /// error_log( $order, 0 );
     //give him points and referrer and credits As well
@@ -59,6 +58,7 @@ function points_payment_complete( $order_id ){
             update_user_meta( $user_id,ApConstants::$USER_POINTS, $point_got);
           //  echo "DOWN Adding Adding Poooins ".$user_points." Points ###";
         }
+        
 
       $user_credits = get_user_meta( $user_id,  ApConstants::$USER_CREDIT, true); 
       if($user_credits){
@@ -67,39 +67,58 @@ function points_payment_complete( $order_id ){
         }else{
              update_user_meta( $user_id,ApConstants::$USER_CREDIT, $credit_got);
         }
-        //Now for the franchise
-        $refferer=get_user_meta( $user->ID, 'billing_referrer', true );
 
-        //echo "FRN  ID ".$refferer." ,, ###";
-        if($refferer){
-            $user_franch = get_user_by('login',$refferer);
 
-            if($user_franch)
-            {
-               $user_id_franch=$user_franch->ID;
-             //  echo "FRN  ID ".$user_id_franch." ,, ###";
-               $point_got=get_option( 'points_settings_tab_downline_points', true );
-               $credit_got=(get_option( 'points_settings_tab_franchisees_credits', true )/100)*$price;
+        //For Refferers its chaining find referer of each referrer ten times
 
-               $user_points = get_user_meta( $user_id_franch, ApConstants::$USER_POINTS, true); 
-                if($user_points){
-                        $tol=$user_points+$point_got;
-                        update_user_meta( $user_id_franch, ApConstants::$USER_POINTS,$tol);
+        for($i=0;$i<10;$i++){
+                         //Now for the franchise
+            $refferer=get_user_meta( $user->ID, 'billing_referrer', true );
+            //echo "FRN  ID ".$refferer." ,, ###";
+            if($refferer){
+                $user_franch = get_user_by('login',$refferer);
+               
+                if($user_franch)
+                {
+                    $user=$user_franch;
+                    $user_id_franch=$user_franch->ID;
+                    //  echo "FRN  ID ".$user_id_franch." ,, ###";
+
+                    if($i==0){
+                        $point_got=get_option( 'points_settings_tab_downline_points', true );
+                        $credit_got=(get_option( 'points_settings_tab_franchisees_credits', true )/100)*$price;
                     }else{
-                        update_user_meta( $user_id_franch,ApConstants::$USER_POINTS, $point_got);
+                        //points_settings_tab_downline_points
+                        $point_got=get_option( 'points_settings_tab_downline_points'.($i+1), true );
+                        $credit_got=(get_option( 'points_settings_tab_franchisees_credits'.($i+1), true )/100)*$price;
+                    }
+               
+
+                    $user_points = get_user_meta( $user_id_franch, ApConstants::$USER_POINTS, true); 
+                    if($user_points){
+                            $tol=$user_points+$point_got;
+                            update_user_meta( $user_id_franch, ApConstants::$USER_POINTS,$tol);
+                    }else{
+                            update_user_meta( $user_id_franch,ApConstants::$USER_POINTS, $point_got);
                     }
 
                     $user_credits = get_user_meta( $user_id_franch,  ApConstants::$USER_CREDIT, true); 
                     if($user_credits){
                             $tol=$user_credits+$credit_got;
                             update_user_meta( $user_id_franch, ApConstants::$USER_CREDIT,$tol);
-                        }else{
+                    }else{
                             update_user_meta( $user_id_franch,ApConstants::$USER_CREDIT, $credit_got);
-                        }
+                    }
 
 
+                }else{
+                    break;
+                }
+            }else{
+                break;
             }
         }
+       
 
     }
 }
@@ -193,14 +212,15 @@ function points_customer_levels_callback() {
       //Points_Settings_Tab::points_calculateUserLevel($user->ID),
         $dat[]=[ 'ID' => $user->ID,'booktitle' => $user->user_login,
          'author' => Points_Settings_Tab::points_calculateUserLevel($user->ID),
-         'isbn' => get_user_meta($user->ID,  ApConstants::$USER_CREDIT, true)
+         'isbn' => get_user_meta($user->ID,  ApConstants::$USER_CREDIT, true),
+         'points'=>get_user_meta($user->ID,  ApConstants::$USER_POINTS, true)
         ]; 
          //get_user_meta($user->ID,  ApConstants::$USER_CREDIT, true)
        // 'isbn' => ""] ;//get_user_meta($user->ID, ApConstants::$USER_POINTS, true)
            
     }
    // print_r($users);
-    print_r($dat);
+    //print_r($dat);
 
    // echo '<ul>';
    // foreach ( $users as $user ) {
