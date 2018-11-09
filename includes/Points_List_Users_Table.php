@@ -21,12 +21,12 @@ class Points_List_Users_Table extends WP_List_Table {
     );
 
         function __construct($data){
-        global $status, $page;
-       // print_r($this->example_data);
-       // echo '</br> >>>>';
-      //  print_r($data);
+            global $status, $page;
+            // print_r($this->example_data);
+            // echo '</br> >>>>';
+            //  print_r($data);
 
-        $this->example_data=$data;
+            $this->example_data=$data;
             parent::__construct( array(
                 'singular'  => __( 'Customer', 'points' ),     //singular name of the listed records
                 'plural'    => __( 'Customers', 'points' ),   //plural name of the listed records
